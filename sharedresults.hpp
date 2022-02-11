@@ -8,7 +8,7 @@ class SharedResults
 {
     static const uint32_t N = 1e6;
 public:
-    std::mutex mtx;
+    std::mutex mtx[N];
     std::atomic<uint64_t> resultArray[N];
 };
 

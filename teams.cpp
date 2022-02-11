@@ -149,7 +149,7 @@ ContestResult TeamNewProcesses::runContest(ContestInput const & contestInput) {
     ContestResult result;
     result.resize(contestInput.size());
 
-    int idx = 0;
+    uint32_t idx = 0;
     pid_t pid;
     bool wait_all = false;
     auto input_size = contestInput.size();
@@ -164,7 +164,7 @@ ContestResult TeamNewProcesses::runContest(ContestInput const & contestInput) {
     mapped_mem = (uint64_t *)mmap(NULL, input_size * sizeof(uint64_t),
                                    prot, flags, fd_memory, 0);
 
-    for (int i = 0; i < input_size; i++) {
+    for (uint32_t i = 0; i < input_size; i++) {
         switch (pid = fork()) {
             case -1:
                 std::cerr << "error in fork.";
@@ -181,11 +181,11 @@ ContestResult TeamNewProcesses::runContest(ContestInput const & contestInput) {
     }
 
     // Wait for getSize() processes to finish.
-    if (wait_all) for (int i = 0; i < size; i++) wait(0);
+    if (wait_all) for (uint32_t i = 0; i < size; i++) wait(0);
     // Wait only for input_size processes.
-    else for (int i = 0; i < idx; i++) wait(0);
+    else for (uint32_t i = 0; i < idx; i++) wait(0);
 
-    for (int i = 0; i < input_size; i++) {
+    for (uint32_t i = 0; i < input_size; i++) {
         result[i] = mapped_mem[i];
     }
     return result;
@@ -210,12 +210,12 @@ ContestResult TeamConstProcesses::runContest(ContestInput const &contestInput) {
 
     std::vector<uint64_t> indexes[processesCount];
     // Split the work for each process.
-    for (int i = 0; i < input_size; i++) {
+    for (uint32_t i = 0; i < input_size; i++) {
         indexes[idx].push_back(i);
         idx = (idx + 1) % processesCount;
     }
 
-    for (int i = 0; i < processesCount; i++) {
+    for (uint32_t i = 0; i < processesCount; i++) {
         switch (pid = fork()) {
             case -1:
                 std::cerr << "error in fork.";
@@ -228,9 +228,9 @@ ContestResult TeamConstProcesses::runContest(ContestInput const &contestInput) {
         }
     }
 
-    for (int i = 0; i < processesCount; i++) wait(0);
+    for (uint32_t i = 0; i < processesCount; i++) wait(0);
 
-    for (int i = 0; i < input_size; i++) {
+    for (uint32_t i = 0; i < input_size; i++) {
         result[i] = mapped_mem[i];
     }
 
@@ -243,7 +243,7 @@ ContestResult TeamAsync::runContest(ContestInput const &contestInput) {
 
     std::future<uint64_t> futures[result.size()];
 
-    int idx = 0;
+    uint32_t idx = 0;
     for (InfInt const &singleInput: contestInput) {
         if (this->getSharedResults()) {
             futures[idx] = std::async(calcSharedCollatz, singleInput, this->getSharedResults());
@@ -253,7 +253,7 @@ ContestResult TeamAsync::runContest(ContestInput const &contestInput) {
         }
         idx++;
     }
-    for (int i = 0; i < result.size(); i++) {
+    for (uint32_t i = 0; i < result.size(); i++) {
         result[i] = futures[i].get();
     }
 
